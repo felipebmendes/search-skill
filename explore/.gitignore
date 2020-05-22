@@ -1,0 +1,8 @@
+doc_vecs
+encoder
+index_to_question_id_mapping
+question_id_to_index_mapping
+questions
+sentence_embeddings
+*.xlsx
+*.csv

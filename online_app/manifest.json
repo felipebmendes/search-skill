@@ -1,0 +1,37 @@
+{
+  "online": {
+    "processes": [
+      {
+        "name": "searchskill",
+        "algorithmName": "main",
+        "namespace": "",
+        "algorithmTitle": {
+          "pt-br": "Search Skill",
+          "en-US": "Search Skill"
+        },
+        "algorithmDescription": {
+          "pt-br": "Search Skill",
+          "en-US": "Search Skill"
+        },
+        "instanceProperties": {
+          "profile": "",
+          "properties": {
+            "dockerImage": "searchskill/searchskill:1.0.0",
+            "flavor": "c1.medium"
+          }
+        }
+      }
+    ]
+  },
+  "docker": [
+    {
+      "dockerName": "searchskill",
+      "dockerTag": "1.0.0",
+      "gitBranch": "master",
+      "gitPath": "/online_app/",
+      "instanceType": "c1.medium",
+      "gitDockerfileName": "Dockerfile", 
+      "gitRepoUrl": "https://github.com/felipebmendes/search-skill.git"
+    }
+  ]
+}
