@@ -22,4 +22,4 @@ jobs:
         carol-app-name: 'searchskill'
         carol-connector-id: ${{ secrets.CAROLCONNECTORID }}
         carol-api-key: ${{ secrets.CAROLAPPOAUTH }}
-        manifest-path: '/online_app/'
+        manifest-path: './online_app/'
