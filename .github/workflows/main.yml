@@ -1,0 +1,25 @@
+name: Build docker image on Carol
+
+# Controls when the action will run. Triggers the workflow on tag creation but
+# only for the master branch. For triggering it on push or pull request events
+# replace tag by push. 
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+        
+    - name: Build
+      uses: totvslabs/carol-build@master
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        carol-tenant: 'mendes'
+        carol-organization: 'datascience'
+        carol-app-name: 'searchskill'
+        carol-connector-id: ${{ secrets.CAROLCONNECTORID }}
+        carol-api-key: ${{ secrets.CAROLAPPOAUTH }}
+        manifest-path: '/online_app/'
