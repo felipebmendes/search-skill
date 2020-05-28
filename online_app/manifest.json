@@ -16,7 +16,7 @@
         "instanceProperties": {
           "profile": "",
           "properties": {
-            "dockerImage": "searchskill/searchskill:1.0.0",
+            "dockerImage": "searchlgpd/searchskill:1.0.0",
             "flavor": "c1.medium"
           }
         }

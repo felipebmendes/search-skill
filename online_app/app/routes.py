@@ -30,7 +30,7 @@ def get_file_from_storage(filename):
     return storage.load(filename, format='pickle', cache=False)
 
 def get_questions_by_ids(question_ids):
-    dm_name = 'articles'
+    dm_name = 'lgpdarticles'
     query_filter = Filter.Builder().must(TYPE_FILTER(value=f'{dm_name}Golden')) \
         .must(TERMS_FILTER(key='mdmGoldenFieldAndValues.id.raw', value=question_ids)).build().to_json()
     page_size=1000

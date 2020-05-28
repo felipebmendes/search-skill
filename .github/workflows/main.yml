@@ -19,7 +19,7 @@ jobs:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         carol-tenant: 'mendes'
         carol-organization: 'datascience'
-        carol-app-name: 'searchskill'
+        carol-app-name: 'searchlgpd'
         carol-connector-id: ${{ secrets.CAROLCONNECTORID }}
         carol-api-key: ${{ secrets.CAROLAPPOAUTH }}
         manifest-path: './online_app/'
