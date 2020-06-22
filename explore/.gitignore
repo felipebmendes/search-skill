@@ -4,5 +4,7 @@ index_to_question_id_mapping
 question_id_to_index_mapping
 questions
 sentence_embeddings
+filter_to_index_mapping
+index_to_filter_mapping
 *.xlsx
 *.csv
