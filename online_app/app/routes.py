@@ -122,14 +122,16 @@ def query():
     logger.debug(f'results: {results}')
     if not results:
         return {'session_id': 1, 'response': responses}
+    responses = []
     for i, question_id in enumerate(question_ids):
-        response = ''
         result = [result for result in results if result['id'] == question_id][0]
-        response = response + 'Pergunta similar: ' + result['question'] + '\n'
-        response = response + 'Resposta: ' + result['solution'] + '\n'
-        response = response + 'Score: ' + str(topk_scores[topk_idx.index(question_id_to_index_mapping[question_id])])
-        if i != 4:
-            response = response +  '\n\n'
+        response = {
+            'matched_question': result['question'],
+            'answer': result['solution'],
+            'score': str(topk_scores[topk_idx.index(question_id_to_index_mapping[question_id])]),
+            'matched_question_labels': result['labels'],
+            'matched_question_labels': question_id
+        }
         output = {
                 'type': 'text',
                 'content':  response
