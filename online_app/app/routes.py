@@ -2,6 +2,7 @@ import itertools
 import logging
 import numpy as np
 import os
+import re
 from flask import Blueprint, current_app, flash, jsonify, request, redirect, render_template, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.urls import url_parse
@@ -129,8 +130,8 @@ def query():
             'matched_question': result['question'],
             'answer': result['solution'],
             'score': str(topk_scores[topk_idx.index(question_id_to_index_mapping[question_id])]),
-            'matched_question_labels': result['labels'],
-            'matched_question_labels': question_id
+            'matched_question_labels': re.sub('\[|\]|\"', '', result['labels']).split(','),
+            'matched_question_id': question_id
         }
         output = {
                 'type': 'text',
