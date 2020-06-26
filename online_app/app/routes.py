@@ -130,7 +130,6 @@ def query():
             'matched_question': result['question'],
             'answer': result['solution'],
             'score': str(topk_scores[topk_idx.index(question_id_to_index_mapping[question_id])]),
-            'matched_question_labels': re.sub('\[|\]|\"', '', result['labels']).split(','),
             'matched_question_id': question_id
         }
         output = {
