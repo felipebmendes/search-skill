@@ -4,10 +4,6 @@ import numpy as np
 import os
 import re
 from flask import Blueprint, current_app, flash, jsonify, request, redirect, render_template, url_for
-from flask_login import current_user, login_required, login_user, logout_user
-from werkzeug.urls import url_parse
-from .carol_login import carol_login, CarolUser, carol_logout
-from .forms import LoginForm
 from pycarol import Carol, Storage, Query
 from pycarol.apps import Apps
 from pycarol.filter import Filter, TYPE_FILTER, TERMS_FILTER
