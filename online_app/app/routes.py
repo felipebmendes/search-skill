@@ -26,6 +26,33 @@ _settings = Apps(login).get_settings()
 
 server_bp = Blueprint('main', __name__)
 
+def update_embeddings():
+    global sentence_embeddings
+    global index_to_question_id_mapping
+    global question_id_to_index_mapping
+    global index_to_filter_mapping
+    global filter_to_index_mapping
+    
+    # Get files from Carol storage
+    logger.debug('Loading sentence embeddings.')
+    sentence_embeddings_tmp = get_file_from_storage('sentence_embeddings')
+    logger.debug('Loading index to question id mapping.')
+    index_to_question_id_mapping_tmp = get_file_from_storage('index_to_question_id_mapping')
+    logger.debug('Loading question id to index mapping.')
+    question_id_to_index_mapping_tmp = get_file_from_storage('question_id_to_index_mapping')
+    logger.debug('Loading index to filter mapping.')
+    index_to_filter_mapping_tmp = get_file_from_storage('index_to_filter_mapping')
+    logger.debug('Loading filter to index mapping.')
+    filter_to_index_mapping_tmp = get_file_from_storage('filter_to_index_mapping')
+    logger.debug('Done')
+
+    # Update values after all of them are loaded from Carol storage
+    sentence_embeddings = sentence_embeddings_tmp
+    index_to_question_id_mapping = index_to_question_id_mapping_tmp
+    question_id_to_index_mapping = question_id_to_index_mapping_tmp
+    index_to_filter_mapping = index_to_filter_mapping_tmp
+    filter_to_index_mapping = filter_to_index_mapping_tmp
+
 def get_file_from_storage(filename):
     return storage.load(filename, format='pickle', cache=False)
 
@@ -58,18 +85,15 @@ def get_similar_questions(model, sentence_embeddings, query, threshold, filter, 
     topk_scores = [score for score in topk_scores if score >= threshold/100]
     topk_idx = topk_idx[:len(topk_scores)]
     return list(topk_idx), list(topk_scores)
-    
+
+sentence_embeddings = None
+index_to_question_id_mapping = None
+question_id_to_index_mapping = None
+index_to_filter_mapping = None
+filter_to_index_mapping = None
+
 # Get files from Carol storage
-logger.debug('Loading sentence embeddings.')
-sentence_embeddings = get_file_from_storage('sentence_embeddings')
-logger.debug('Loading index to question id mapping.')
-index_to_question_id_mapping = get_file_from_storage('index_to_question_id_mapping')
-logger.debug('Loading question id to index mapping.')
-question_id_to_index_mapping = get_file_from_storage('question_id_to_index_mapping')
-logger.debug('Loading index to filter mapping.')
-index_to_filter_mapping = get_file_from_storage('index_to_filter_mapping')
-logger.debug('Loading filter to index mapping.')
-filter_to_index_mapping = get_file_from_storage('filter_to_index_mapping')
+update_embeddings()    
 
 # Load Sentence model
 logger.debug('Loading pre-trained model.')
@@ -80,6 +104,13 @@ logger.debug('Done')
 @server_bp.route('/', methods=['GET'])
 def ping():
     return jsonify('App is running. Send a request to /query')
+
+
+@server_bp.route('/update_embeddings', methods=['GET'])
+def update_embeddings_route():
+    update_embeddings()
+    return jsonify('Embeddings are updated.')
+
 
 @server_bp.route('/query', methods=['POST'])
 def query():
