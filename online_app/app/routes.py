@@ -65,6 +65,7 @@ def get_questions_by_ids(question_ids):
     return Query(login, page_size=page_size).query(query_filter).go().results
 
 def get_similar_questions(model, sentence_embeddings, query, threshold, filter, type_filter, k):
+    query = query.lower()
     query_vec = model.encode([query])
     logger.debug(query)
     logger.debug(threshold)
