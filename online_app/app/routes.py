@@ -104,11 +104,12 @@ logger.debug('Done')
 
 @server_bp.route('/', methods=['GET'])
 def ping():
-    return jsonify('App is running. Send a request to /query')
+    return jsonify('App is running. Send a request to /query for document searching or to /update_embeddings to update the document embeddings.')
 
 
 @server_bp.route('/update_embeddings', methods=['GET'])
 def update_embeddings_route():
+    logger.debug('Updating embeddings.')
     update_embeddings()
     return jsonify('Embeddings are updated.')
 

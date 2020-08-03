@@ -16,7 +16,7 @@
         "instanceProperties": {
           "profile": "",
           "properties": {
-            "dockerImage": "lgpdmodel/searchskill:1.0.0",
+            "dockerImage": "searchlgpddocuments/searchlgpd:1.0.0",
             "flavor": "c1.medium"
           }
         }
@@ -25,7 +25,7 @@
   },
   "docker": [
     {
-      "dockerName": "searchskill",
+      "dockerName": "searchlgpd",
       "dockerTag": "1.0.0",
       "gitBranch": "master",
       "gitPath": "/online_app/",
