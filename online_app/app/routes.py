@@ -29,7 +29,6 @@ server_bp = Blueprint('main', __name__)
 def update_embeddings():
     global sentence_embeddings
     global index_to_question_id_mapping
-    global question_id_to_index_mapping
     global index_to_filter_mapping
     global filter_to_index_mapping
     
@@ -38,8 +37,6 @@ def update_embeddings():
     sentence_embeddings_tmp = get_file_from_storage('sentence_embeddings')
     logger.debug('Loading index to question id mapping.')
     index_to_question_id_mapping_tmp = get_file_from_storage('index_to_question_id_mapping')
-    logger.debug('Loading question id to index mapping.')
-    question_id_to_index_mapping_tmp = get_file_from_storage('question_id_to_index_mapping')
     logger.debug('Loading index to filter mapping.')
     index_to_filter_mapping_tmp = get_file_from_storage('index_to_filter_mapping')
     logger.debug('Loading filter to index mapping.')
@@ -49,7 +46,6 @@ def update_embeddings():
     # Update values after all of them are loaded from Carol storage
     sentence_embeddings = sentence_embeddings_tmp
     index_to_question_id_mapping = index_to_question_id_mapping_tmp
-    question_id_to_index_mapping = question_id_to_index_mapping_tmp
     index_to_filter_mapping = index_to_filter_mapping_tmp
     filter_to_index_mapping = filter_to_index_mapping_tmp
 
@@ -68,10 +64,6 @@ def get_similar_questions(model, sentence_embeddings, query, threshold, filter, 
     query = query.lower()
     query_vec = model.encode([query])
     logger.debug(query)
-    logger.debug(threshold)
-    logger.debug(filter)
-    logger.debug(type_filter)
-    logger.debug(k)
     score = np.sum(query_vec[0] * sentence_embeddings, axis=1) / np.linalg.norm(sentence_embeddings, axis=1)
     topk_scores = np.sort(score)[::-1]
     topk_idx = np.argsort(score)[::-1]
@@ -89,7 +81,6 @@ def get_similar_questions(model, sentence_embeddings, query, threshold, filter, 
 
 sentence_embeddings = None
 index_to_question_id_mapping = None
-question_id_to_index_mapping = None
 index_to_filter_mapping = None
 filter_to_index_mapping = None
 
@@ -144,6 +135,7 @@ def query():
         filter_idx = None
     topk_idx, topk_scores = get_similar_questions(model, sentence_embeddings, query, threshold, filter_idx, type_filter, k)
     logger.debug(f'topk_idx: {topk_idx}')
+    logger.debug(f'topk_scores: {topk_scores}')
     if not topk_idx:
         return {'session_id': 1, 'response': responses}
     question_ids = [index_to_question_id_mapping[idx] for idx in topk_idx]
@@ -153,12 +145,13 @@ def query():
     if not results:
         return {'session_id': 1, 'response': responses}
     responses = []
-    for i, question_id in enumerate(question_ids):
+    for i, question in enumerate(zip(question_ids, topk_scores)):
+        question_id, topk_score = question
         result = [result for result in results if result['id'] == question_id][0]
         response = {
             'matched_question': result['question'],
             'answer': result['solution'],
-            'score': str(topk_scores[topk_idx.index(question_id_to_index_mapping[question_id])]),
+            'score': str(topk_score),
             'matched_question_id': question_id
         }
         output = {
