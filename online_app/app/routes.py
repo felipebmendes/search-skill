@@ -7,7 +7,7 @@ from flask import Blueprint, current_app, flash, jsonify, request, redirect, ren
 from pycarol import Carol, Storage, Query
 from pycarol.apps import Apps
 from pycarol.filter import Filter, TYPE_FILTER, TERMS_FILTER
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer, util
 from webargs import fields, ValidationError
 from webargs.flaskparser import parser
 
@@ -62,19 +62,21 @@ def get_questions_by_ids(question_ids):
 
 def get_similar_questions(model, sentence_embeddings, query, threshold, filter, type_filter, k):
     query = query.lower()
-    query_vec = model.encode([query])
+    query_vec = model.encode([query], convert_to_tensor=True)
     logger.debug(query)
-    score = np.sum(query_vec[0] * sentence_embeddings, axis=1) / np.linalg.norm(sentence_embeddings, axis=1)
+    score = util.pytorch_cos_sim(query_vec, sentence_embeddings)
+    score = score.cpu().detach().numpy()[-1,:]
     topk_scores = np.sort(score)[::-1]
     topk_idx = np.argsort(score)[::-1]
     topk_mapping = {idx:topk_scores[i] for i,idx in enumerate(topk_idx)}
+    logger.info(f'filter: {filter}')
     if filter:
         if type_filter == 'include':
             topk_idx = [idx for idx in topk_idx if idx in filter]
         else:
             topk_idx = [idx for idx in topk_idx if idx not in filter]
         topk_scores = [topk_mapping[idx] for idx in topk_idx]
-    topk_scores = topk_scores[:k]
+    topk_scores = topk_scores[:(k*2)]
     topk_scores = [score for score in topk_scores if score >= threshold/100]
     topk_idx = topk_idx[:len(topk_scores)]
     return list(topk_idx), list(topk_scores)
@@ -138,10 +140,10 @@ def query():
     logger.debug(f'topk_scores: {topk_scores}')
     if not topk_idx:
         return {'session_id': 1, 'response': responses}
-    question_ids = [index_to_question_id_mapping[idx] for idx in topk_idx]
+    question_ids = {index_to_question_id_mapping[idx] for idx in topk_idx}
+    question_ids = list(question_ids)[:k]
     logger.debug(f'questions: {question_ids}')
     results = get_questions_by_ids(question_ids)
-    logger.debug(f'results: {results}')
     if not results:
         return {'session_id': 1, 'response': responses}
     responses = []
