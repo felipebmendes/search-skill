@@ -4,6 +4,7 @@ import numpy as np
 import os
 import re
 from flask import Blueprint, current_app, flash, jsonify, request, redirect, render_template, url_for
+from collections import OrderedDict
 from pycarol import Carol, Storage, Query
 from pycarol.apps import Apps
 from pycarol.filter import Filter, TYPE_FILTER, TERMS_FILTER
@@ -77,6 +78,7 @@ def get_similar_questions(model, sentence_embeddings, query, threshold, filter, 
             topk_idx = [idx for idx in topk_idx if idx not in filter]
         topk_scores = [topk_mapping[idx] for idx in topk_idx]
     topk_scores = topk_scores[:(k*2)]
+    logger.info(f'pre topk_scores: {topk_scores}')
     topk_scores = [score for score in topk_scores if score >= threshold/100]
     topk_idx = topk_idx[:len(topk_scores)]
     return list(topk_idx), list(topk_scores)
@@ -140,8 +142,8 @@ def query():
     logger.debug(f'topk_scores: {topk_scores}')
     if not topk_idx:
         return {'session_id': 1, 'response': responses}
-    question_ids = {index_to_question_id_mapping[idx] for idx in topk_idx}
-    question_ids = list(question_ids)[:k]
+    question_ids = [index_to_question_id_mapping[idx] for idx in topk_idx]
+    question_ids = list(OrderedDict.fromkeys(question_ids))[:k]
     logger.debug(f'questions: {question_ids}')
     results = get_questions_by_ids(question_ids)
     if not results:
