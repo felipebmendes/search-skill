@@ -69,15 +69,16 @@ def get_similar_questions(model, sentence_embeddings, query, threshold, filter, 
     score = score.cpu().detach().numpy()[-1,:]
     topk_scores = np.sort(score)[::-1]
     topk_idx = np.argsort(score)[::-1]
+    topk_scores = topk_scores[:(k*5)]
+    topk_idx = topk_idx[:(k*5)]
     topk_mapping = {idx:topk_scores[i] for i,idx in enumerate(topk_idx)}
-    logger.info(f'filter: {filter}')
+    logger.info(f'type_filter: {type_filter}')
     if filter:
         if type_filter == 'include':
             topk_idx = [idx for idx in topk_idx if idx in filter]
         else:
             topk_idx = [idx for idx in topk_idx if idx not in filter]
         topk_scores = [topk_mapping[idx] for idx in topk_idx]
-    topk_scores = topk_scores[:(k*2)]
     logger.info(f'pre topk_scores: {topk_scores}')
     topk_scores = [score for score in topk_scores if score >= threshold/100]
     topk_idx = topk_idx[:len(topk_scores)]
