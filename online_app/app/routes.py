@@ -145,6 +145,7 @@ def query():
         return {'session_id': 1, 'response': responses}
     question_ids = [index_to_question_id_mapping[idx] for idx in topk_idx]
     question_ids = list(OrderedDict.fromkeys(question_ids))[:k]
+    question_ids = [str(id) for id in question_ids]
     logger.debug(f'questions: {question_ids}')
     results = get_questions_by_ids(question_ids)
     if not results:
