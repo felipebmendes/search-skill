@@ -143,8 +143,16 @@ def query():
     logger.debug(f'topk_scores: {topk_scores}')
     if not topk_idx:
         return {'session_id': 1, 'response': responses}
-    question_ids = [index_to_question_id_mapping[idx] for idx in topk_idx]
-    question_ids = list(OrderedDict.fromkeys(question_ids))[:k]
+    question_ids_aux = [index_to_question_id_mapping[idx] for idx in topk_idx]
+    question_ids = []
+    topk_scores_aux = []
+    for i, q in enumerate(question_ids_aux):
+        if q not in question_ids:
+            question_ids.append(q)
+            topk_scores_aux.append(topk_scores[i])
+    topk_scores = topk_scores_aux
+    del question_ids_aux
+    del topk_scores_aux
     question_ids = [str(id) for id in question_ids]
     logger.debug(f'questions: {question_ids}')
     results = get_questions_by_ids(question_ids)
